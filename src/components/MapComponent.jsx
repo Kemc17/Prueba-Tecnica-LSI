@@ -12,10 +12,14 @@ const MapComponent = ({
     height: "100%",
   };
 
-  const initialCenter = {
+  const defaultCenter = {
     lat: 13.6929, 
     lng: -89.2182,
   };
+
+  const center = selectedLocation.lat && selectedLocation.lng 
+    ? { lat: selectedLocation.lat, lng: selectedLocation.lng }
+    : defaultCenter;
 
   return (
     <div className="bg-gray-300 rounded-lg overflow-hidden relative h-96">
@@ -23,7 +27,7 @@ const MapComponent = ({
         <GoogleMap
           mapContainerStyle={mapContainerStyle}
           zoom={13}
-          center={initialCenter}
+          center={center} 
           onClick={handleMapClick}
         >
           {selectedLocation.lat && selectedLocation.lng && (

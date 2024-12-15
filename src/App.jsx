@@ -43,9 +43,12 @@ const App = () => {
 
   const saveLocation = () => {
     if (selectedLocation.name && selectedLocation.lat && selectedLocation.lng) {
-      setLocations([...locations, selectedLocation]);
-      setSelectedLocation({ name: "", lat: null, lng: null, address: "" });
-      setShowInfoWindow(false);
+      setLocations([...locations, selectedLocation]); 
+      setSelectedLocation((prev) => ({
+        ...prev, 
+        name: "", 
+      }));
+      setShowInfoWindow(false); 
     }
   };
 
