@@ -6,11 +6,10 @@ const MapComponent = ({
   handleMapClick,
   showInfoWindow,
   setShowInfoWindow,
-  setSelectedLocation,
 }) => {
   const mapContainerStyle = {
     width: "100%",
-    height: "100%", 
+    height: "100%",
   };
 
   const defaultCenter = {
@@ -21,11 +20,6 @@ const MapComponent = ({
   const center = selectedLocation.lat && selectedLocation.lng
     ? { lat: selectedLocation.lat, lng: selectedLocation.lng }
     : defaultCenter;
-
-  const handleClosePopup = () => {
-    setShowInfoWindow(false); 
-    setSelectedLocation({ name: "", lat: null, lng: null, address: "" }); // Limpia la ubicación
-  };
 
   return (
     <div className="h-full">
@@ -45,7 +39,7 @@ const MapComponent = ({
               {showInfoWindow && (
                 <InfoWindow
                   position={{ lat: selectedLocation.lat, lng: selectedLocation.lng }}
-                  onCloseClick={handleClosePopup}
+                  onCloseClick={() => setShowInfoWindow(false)} 
                 >
                   <div>
                     <h3 className="font-bold text-lg">Información</h3>

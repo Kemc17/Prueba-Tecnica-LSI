@@ -66,7 +66,7 @@ const App = () => {
             />
           </div>
 
-          <div className="w-full h-[350px] bg-gray-300 rounded-lg overflow-hidden">
+          <div className="w-full h-[450px] bg-gray-300 rounded-lg overflow-hidden">
             <MapComponent
               selectedLocation={selectedLocation}
               handleMapClick={handleMapClick}
@@ -77,7 +77,7 @@ const App = () => {
           </div>
         </div>
 
-        <div className="bg-white flex flex-col w-full p-6 rounded shadow-md h-full max-h-screen">   
+        <div className="bg-white flex flex-col w-full rounded h-full max-h-screen">   
           <div className="overflow-y-auto flex-1">
             <LocationList locations={locations} />
           </div>
