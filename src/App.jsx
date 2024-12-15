@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import MapComponent from "./components/MapComponent";
 import LocationForm from "./components/LocationForm";
-import LocationList from "./components/LocationList";
 
 const App = () => {
   
@@ -24,11 +23,12 @@ const App = () => {
   const [locations, setLocations] = useState(getStoredLocations());
   const [showInfoWindow, setShowInfoWindow] = useState(false);
 
-  
   const [nameError, setNameError] = useState(false);
   const [addressError, setAddressError] = useState(false);
 
-  
+  const [editingIndex, setEditingIndex] = useState(null);
+  const [editingName, setEditingName] = useState("");
+
   useEffect(() => {
     localStorage.setItem("locations", JSON.stringify(locations));
   }, [locations]);
@@ -62,7 +62,6 @@ const App = () => {
   const saveLocation = () => {
     let hasError = false;
 
-    
     if (!selectedLocation.name) {
       setNameError(true);
       hasError = true;
@@ -70,7 +69,6 @@ const App = () => {
       setNameError(false);
     }
 
-    
     if (!selectedLocation.lat || !selectedLocation.lng) {
       setAddressError(true);
       hasError = true;
@@ -78,22 +76,31 @@ const App = () => {
       setAddressError(false);
     }
 
-    
     if (hasError) return;
 
-    
     setLocations([...locations, selectedLocation]);
     setSelectedLocation({ name: "", lat: null, lng: null, address: "" });
     setShowInfoWindow(false);
+  };
+
+  const startEditing = (index, currentName) => {
+    setEditingIndex(index);
+    setEditingName(currentName);
+  };
+
+  const saveEditing = () => {
+    const updatedLocations = [...locations];
+    updatedLocations[editingIndex].name = editingName;
+    setLocations(updatedLocations);
+    setEditingIndex(null);
+    setEditingName("");
   };
 
   return (
     <section className="text-gray-600 body-font relative h-screen">
       <div className="container mx-auto grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-8 h-full">
         
-        
         <div className="flex flex-col gap-4 h-full">
-          
           
           <div className="w-full flex flex-col items-center">
             <LocationForm
@@ -102,7 +109,7 @@ const App = () => {
               saveLocation={saveLocation}
             />
             
-            <div className="mt-4">
+            <div>
               {nameError && (
                 <label className="text-red-500 text-sm block text-center">
                   Por favor, ingresa un nombre.
@@ -116,7 +123,6 @@ const App = () => {
             </div>
           </div>
 
-          
           <div className="w-full h-[400px] bg-gray-300 rounded-lg overflow-hidden">
             <MapComponent
               selectedLocation={selectedLocation}
@@ -128,7 +134,6 @@ const App = () => {
           </div>
         </div>
 
-        
         <div className="bg-white flex flex-col w-full rounded h-full max-h-screen">
           <div className="overflow-y-auto flex-1 mt-6">
             {locations.length === 0 ? (
@@ -138,7 +143,41 @@ const App = () => {
                 </p>
               </div>
             ) : (
-              <LocationList locations={locations} />
+              <ul>
+                {locations.map((location, index) => (
+                  <li key={index} className="flex flex-col border-b p-4">
+                    {editingIndex === index ? (
+                      <div className="flex items-center gap-2">
+                        <input
+                          className="border border-gray-300 rounded p-1 flex-grow"
+                          value={editingName}
+                          onChange={(e) => setEditingName(e.target.value)}
+                        />
+                        <button
+                          className="bg-blue-500 text-white px-2 py-1 rounded"
+                          onClick={saveEditing}
+                        >
+                          Guardar
+                        </button>
+                      </div>
+                    ) : (
+                      <>
+                        <p><strong>Nombre:</strong> {location.name}</p>
+                        <p><strong>Dirección:</strong> {location.address}</p>
+                        <p>
+                          <strong>Latitud:</strong> {location.lat}, <strong>Longitud:</strong> {location.lng}
+                        </p>
+                        <button
+                          className="text-blue-500 underline mt-2"
+                          onClick={() => startEditing(index, location.name)}
+                        >
+                          Editar nombre
+                        </button>
+                      </>
+                    )}
+                  </li>
+                ))}
+              </ul>
             )}
           </div>
         </div>
