@@ -6,31 +6,37 @@ const MapComponent = ({
   handleMapClick,
   showInfoWindow,
   setShowInfoWindow,
+  setSelectedLocation,
 }) => {
   const mapContainerStyle = {
     width: "100%",
-    height: "100%",
+    height: "100%", 
   };
 
   const defaultCenter = {
-    lat: 13.6929, 
+    lat: 13.6929,
     lng: -89.2182,
   };
 
-  const center = selectedLocation.lat && selectedLocation.lng 
+  const center = selectedLocation.lat && selectedLocation.lng
     ? { lat: selectedLocation.lat, lng: selectedLocation.lng }
     : defaultCenter;
 
+  const handleClosePopup = () => {
+    setShowInfoWindow(false); 
+    setSelectedLocation({ name: "", lat: null, lng: null, address: "" }); // Limpia la ubicación
+  };
+
   return (
-    <div className="bg-gray-300 rounded-lg overflow-hidden relative h-96">
+    <div className="h-full">
       <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}>
         <GoogleMap
           mapContainerStyle={mapContainerStyle}
           zoom={13}
-          center={center} 
+          center={center}
           onClick={handleMapClick}
         >
-          {selectedLocation.lat && selectedLocation.lng && (
+          {selectedLocation.lat !== null && selectedLocation.lng !== null && (
             <>
               <Marker
                 position={{ lat: selectedLocation.lat, lng: selectedLocation.lng }}
@@ -39,7 +45,7 @@ const MapComponent = ({
               {showInfoWindow && (
                 <InfoWindow
                   position={{ lat: selectedLocation.lat, lng: selectedLocation.lng }}
-                  onCloseClick={() => setShowInfoWindow(false)}
+                  onCloseClick={handleClosePopup}
                 >
                   <div>
                     <h3 className="font-bold text-lg">Información</h3>

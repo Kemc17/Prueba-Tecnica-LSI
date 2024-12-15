@@ -43,39 +43,46 @@ const App = () => {
 
   const saveLocation = () => {
     if (selectedLocation.name && selectedLocation.lat && selectedLocation.lng) {
-      setLocations([...locations, selectedLocation]); 
+      setLocations([...locations, selectedLocation]);
       setSelectedLocation((prev) => ({
-        ...prev, 
+        ...prev,
         name: "", 
       }));
-      setShowInfoWindow(false); 
+      setShowInfoWindow(false);
     }
   };
 
   return (
-    <section className="text-gray-600 body-font relative">
-      
-      <div className="container px-5 py-10 mx-auto grid grid-cols-1 lg:grid-cols-[7fr_3fr] gap-8">
-      
-        <div className="bg-gray-300 rounded-lg overflow-hidden relative h-96 lg:h-full">
-          <MapComponent
-            selectedLocation={selectedLocation}
-            handleMapClick={handleMapClick}
-            showInfoWindow={showInfoWindow}
-            setShowInfoWindow={setShowInfoWindow}
-          />
+    <section className="text-gray-600 body-font relative h-screen">
+      <div className="container mx-auto grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-8 h-full">
+        
+        <div className="flex flex-col gap-4 h-full">
+          
+          <div className="w-full">
+            <LocationForm
+              selectedLocation={selectedLocation}
+              setSelectedLocation={setSelectedLocation}
+              saveLocation={saveLocation}
+            />
+          </div>
+
+          <div className="w-full h-[350px] bg-gray-300 rounded-lg overflow-hidden">
+            <MapComponent
+              selectedLocation={selectedLocation}
+              handleMapClick={handleMapClick}
+              showInfoWindow={showInfoWindow}
+              setShowInfoWindow={setShowInfoWindow}
+              setSelectedLocation={setSelectedLocation}
+            />
+          </div>
         </div>
 
-        <div className="bg-white flex flex-col w-full p-6 rounded shadow-md">
-          <LocationForm
-            selectedLocation={selectedLocation}
-            setSelectedLocation={setSelectedLocation}
-            saveLocation={saveLocation}
-          />
+        <div className="bg-white flex flex-col w-full p-6 rounded shadow-md h-full max-h-screen">   
+          <div className="overflow-y-auto flex-1">
+            <LocationList locations={locations} />
+          </div>
         </div>
       </div>
-
-      <LocationList locations={locations} />
     </section>
   );
 };
