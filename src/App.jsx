@@ -25,6 +25,10 @@ const App = () => {
   const [showInfoWindow, setShowInfoWindow] = useState(false);
 
   
+  const [nameError, setNameError] = useState(false);
+  const [addressError, setAddressError] = useState(false);
+
+  
   useEffect(() => {
     localStorage.setItem("locations", JSON.stringify(locations));
   }, [locations]);
@@ -56,6 +60,28 @@ const App = () => {
   };
 
   const saveLocation = () => {
+    let hasError = false;
+
+    
+    if (!selectedLocation.name) {
+      setNameError(true);
+      hasError = true;
+    } else {
+      setNameError(false);
+    }
+
+    
+    if (!selectedLocation.lat || !selectedLocation.lng) {
+      setAddressError(true);
+      hasError = true;
+    } else {
+      setAddressError(false);
+    }
+
+    
+    if (hasError) return;
+
+    
     setLocations([...locations, selectedLocation]);
     setSelectedLocation({ name: "", lat: null, lng: null, address: "" });
     setShowInfoWindow(false);
@@ -65,19 +91,33 @@ const App = () => {
     <section className="text-gray-600 body-font relative h-screen">
       <div className="container mx-auto grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-8 h-full">
         
+        
         <div className="flex flex-col gap-4 h-full">
           
-        
-          <div className="w-full">
+          
+          <div className="w-full flex flex-col items-center">
             <LocationForm
               selectedLocation={selectedLocation}
               setSelectedLocation={setSelectedLocation}
               saveLocation={saveLocation}
             />
+            
+            <div className="mt-4">
+              {nameError && (
+                <label className="text-red-500 text-sm block text-center">
+                  Por favor, ingresa un nombre.
+                </label>
+              )}
+              {addressError && (
+                <label className="text-red-500 text-sm block text-center">
+                  Por favor, selecciona un punto en el mapa.
+                </label>
+              )}
+            </div>
           </div>
 
           
-          <div className="w-full h-[450px] bg-gray-300 rounded-lg overflow-hidden">
+          <div className="w-full h-[400px] bg-gray-300 rounded-lg overflow-hidden">
             <MapComponent
               selectedLocation={selectedLocation}
               handleMapClick={handleMapClick}
@@ -88,7 +128,7 @@ const App = () => {
           </div>
         </div>
 
-
+        
         <div className="bg-white flex flex-col w-full rounded h-full max-h-screen">
           <div className="overflow-y-auto flex-1 mt-6">
             {locations.length === 0 ? (
