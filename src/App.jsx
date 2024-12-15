@@ -19,14 +19,21 @@ const App = () => {
   };
 
   const initialCenter = {
-    lat: 13.6929,
+    lat: 13.6929, 
     lng: -89.2182,
   };
 
   const handleMapClick = async (event) => {
     const lat = event.latLng.lat();
     const lng = event.latLng.lng();
-    setSelectedLocation({ name: "", lat, lng, address: "Buscando dirección..." });
+
+    
+    setSelectedLocation((prev) => ({
+      ...prev,
+      lat,
+      lng,
+      address: "Buscando dirección...",
+    }));
     setShowInfoWindow(false);
 
     if (mapRef.current) {
@@ -50,7 +57,7 @@ const App = () => {
 
   const saveLocation = () => {
     if (selectedLocation.name && selectedLocation.lat && selectedLocation.lng) {
-      setLocations([...locations, selectedLocation]);
+      setLocations([...locations, selectedLocation]); 
       setSelectedLocation({ name: "", lat: null, lng: null, address: "" });
       setShowInfoWindow(false);
     }
@@ -64,7 +71,7 @@ const App = () => {
   return (
     <section className="text-gray-600 body-font relative">
       <div className="container px-5 py-10 mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Mapa interactivo */}
+        
         <div className="col-span-1 lg:col-span-2 bg-gray-300 rounded-lg overflow-hidden relative h-96">
           <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}>
             <GoogleMap
@@ -83,8 +90,8 @@ const App = () => {
                     <InfoWindow
                       position={{ lat: selectedLocation.lat, lng: selectedLocation.lng }}
                       onCloseClick={() => {
-                        setShowInfoWindow(false); // Ocultar el popup
-                        setSelectedLocation({ name: "", lat: null, lng: null, address: "" }); // Eliminar marcador
+                        setShowInfoWindow(false);
+                        setSelectedLocation({ name: "", lat: null, lng: null, address: "" });
                       }}
                       options={{
                         disableAutoPan: true,
@@ -134,6 +141,27 @@ const App = () => {
             Guardar
           </button>
         </div>
+      </div>
+
+      
+      <div className="container mx-auto px-5 py-6">
+        <h2 className="text-xl font-bold mb-4">Localizaciones guardadas</h2>
+        {locations.length === 0 ? (
+          <div className="border-dashed border-2 border-gray-300 p-6 rounded text-center">
+            <p className="text-gray-500">No hay localizaciones guardadas.</p>
+          </div>
+        ) : (
+          <ul className="space-y-4">
+            {locations.map((loc, index) => (
+              <li key={index} className="border p-4 rounded shadow-md">
+                <p><strong>Nombre:</strong> {loc.name}</p>
+                <p><strong>Dirección:</strong> {loc.address}</p>
+                <p><strong>Latitud:</strong> {loc.lat}</p>
+                <p><strong>Longitud:</strong> {loc.lng}</p>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     </section>
   );
