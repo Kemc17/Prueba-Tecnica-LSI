@@ -2,7 +2,7 @@ import React from "react";
 
 const LocationForm = ({ selectedLocation, setSelectedLocation, saveLocation }) => {
   return (
-    <div className="w-full p-6 bg-white rounded-md"> {/* Ajustamos el diseño */}
+    <div className="w-full p-6 bg-white rounded-md"> 
       <h2 className="text-gray-900 text-lg mb-2 font-medium title-font">
         Agregar localización
       </h2>

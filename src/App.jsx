@@ -1,9 +1,19 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import MapComponent from "./components/MapComponent";
 import LocationForm from "./components/LocationForm";
 import LocationList from "./components/LocationList";
 
 const App = () => {
+  
+  const getStoredLocations = () => {
+    try {
+      const stored = localStorage.getItem("locations");
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  };
+
   const [selectedLocation, setSelectedLocation] = useState({
     name: "",
     lat: null,
@@ -11,8 +21,13 @@ const App = () => {
     address: "",
   });
 
-  const [locations, setLocations] = useState([]);
+  const [locations, setLocations] = useState(getStoredLocations());
   const [showInfoWindow, setShowInfoWindow] = useState(false);
+
+  
+  useEffect(() => {
+    localStorage.setItem("locations", JSON.stringify(locations));
+  }, [locations]);
 
   const handleMapClick = async (event) => {
     const lat = event.latLng.lat();
@@ -34,22 +49,16 @@ const App = () => {
       const address = data.results[0]?.formatted_address || "Dirección no encontrada.";
       setSelectedLocation((prev) => ({ ...prev, address }));
       setShowInfoWindow(true);
-    } catch (error) {
-      console.error("Error al obtener la dirección:", error);
+    } catch {
       setSelectedLocation((prev) => ({ ...prev, address: "Error al obtener dirección." }));
       setShowInfoWindow(true);
     }
   };
 
   const saveLocation = () => {
-    if (selectedLocation.name && selectedLocation.lat && selectedLocation.lng) {
-      setLocations([...locations, selectedLocation]);
-      setSelectedLocation((prev) => ({
-        ...prev,
-        name: "", 
-      }));
-      setShowInfoWindow(false);
-    }
+    setLocations([...locations, selectedLocation]);
+    setSelectedLocation({ name: "", lat: null, lng: null, address: "" });
+    setShowInfoWindow(false);
   };
 
   return (
@@ -58,6 +67,7 @@ const App = () => {
         
         <div className="flex flex-col gap-4 h-full">
           
+        
           <div className="w-full">
             <LocationForm
               selectedLocation={selectedLocation}
@@ -66,6 +76,7 @@ const App = () => {
             />
           </div>
 
+          
           <div className="w-full h-[450px] bg-gray-300 rounded-lg overflow-hidden">
             <MapComponent
               selectedLocation={selectedLocation}
@@ -77,9 +88,18 @@ const App = () => {
           </div>
         </div>
 
-        <div className="bg-white flex flex-col w-full rounded h-full max-h-screen">   
-          <div className="overflow-y-auto flex-1">
-            <LocationList locations={locations} />
+
+        <div className="bg-white flex flex-col w-full rounded h-full max-h-screen">
+          <div className="overflow-y-auto flex-1 mt-6">
+            {locations.length === 0 ? (
+              <div className="border-2 border-dotted border-gray-400 rounded-lg p-8 text-center mx-auto w-3/4">
+                <p className="text-gray-500 text-lg font-semibold">
+                  No hay localizaciones guardadas.
+                </p>
+              </div>
+            ) : (
+              <LocationList locations={locations} />
+            )}
           </div>
         </div>
       </div>
