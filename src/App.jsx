@@ -1,18 +1,10 @@
 import React, { useState, useEffect } from "react";
 import MapComponent from "./components/MapComponent";
 import LocationForm from "./components/LocationForm";
+import LocationList from "./components/LocationList";
+import { getStoredLocations, saveLocationsToStorage } from "./utils";
 
 const App = () => {
-  
-  const getStoredLocations = () => {
-    try {
-      const stored = localStorage.getItem("locations");
-      return stored ? JSON.parse(stored) : [];
-    } catch {
-      return [];
-    }
-  };
-
   const [selectedLocation, setSelectedLocation] = useState({
     name: "",
     lat: null,
@@ -30,7 +22,7 @@ const App = () => {
   const [editingName, setEditingName] = useState("");
 
   useEffect(() => {
-    localStorage.setItem("locations", JSON.stringify(locations));
+    saveLocationsToStorage(locations);
   }, [locations]);
 
   const handleMapClick = async (event) => {
@@ -38,11 +30,12 @@ const App = () => {
     const lng = event.latLng.lng();
 
     setSelectedLocation((prev) => ({
-      ...prev,
+      ...prev, 
       lat,
       lng,
       address: "Buscando dirección...",
     }));
+
     setShowInfoWindow(false);
 
     try {
@@ -60,23 +53,17 @@ const App = () => {
   };
 
   const saveLocation = () => {
-    let hasError = false;
-
     if (!selectedLocation.name) {
       setNameError(true);
-      hasError = true;
-    } else {
-      setNameError(false);
+      return;
     }
+    setNameError(false);
 
     if (!selectedLocation.lat || !selectedLocation.lng) {
       setAddressError(true);
-      hasError = true;
-    } else {
-      setAddressError(false);
+      return;
     }
-
-    if (hasError) return;
+    setAddressError(false);
 
     setLocations([...locations, selectedLocation]);
     setSelectedLocation({ name: "", lat: null, lng: null, address: "" });
@@ -99,30 +86,14 @@ const App = () => {
   return (
     <section className="text-gray-600 body-font relative h-screen">
       <div className="container mx-auto grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-8 h-full">
-        
         <div className="flex flex-col gap-4 h-full">
-          
-          <div className="w-full flex flex-col items-center">
-            <LocationForm
-              selectedLocation={selectedLocation}
-              setSelectedLocation={setSelectedLocation}
-              saveLocation={saveLocation}
-            />
-            
-            <div>
-              {nameError && (
-                <label className="text-red-500 text-sm block text-center">
-                  Por favor, ingresa un nombre.
-                </label>
-              )}
-              {addressError && (
-                <label className="text-red-500 text-sm block text-center">
-                  Por favor, selecciona un punto en el mapa.
-                </label>
-              )}
-            </div>
-          </div>
-
+          <LocationForm
+            selectedLocation={selectedLocation}
+            setSelectedLocation={setSelectedLocation}
+            saveLocation={saveLocation}
+            nameError={nameError}
+            addressError={addressError}
+          />
           <div className="w-full h-[400px] bg-gray-300 rounded-lg overflow-hidden">
             <MapComponent
               selectedLocation={selectedLocation}
@@ -135,51 +106,14 @@ const App = () => {
         </div>
 
         <div className="bg-white flex flex-col w-full rounded h-full max-h-screen">
-          <div className="overflow-y-auto flex-1 mt-6">
-            {locations.length === 0 ? (
-              <div className="border-2 border-dotted border-gray-400 rounded-lg p-8 text-center mx-auto w-3/4">
-                <p className="text-gray-500 text-lg font-semibold">
-                  No hay localizaciones guardadas.
-                </p>
-              </div>
-            ) : (
-              <ul>
-                {locations.map((location, index) => (
-                  <li key={index} className="flex flex-col border-b p-4">
-                    {editingIndex === index ? (
-                      <div className="flex items-center gap-2">
-                        <input
-                          className="border border-gray-300 rounded p-1 flex-grow"
-                          value={editingName}
-                          onChange={(e) => setEditingName(e.target.value)}
-                        />
-                        <button
-                          className="bg-blue-500 text-white px-2 py-1 rounded"
-                          onClick={saveEditing}
-                        >
-                          Guardar
-                        </button>
-                      </div>
-                    ) : (
-                      <>
-                        <p><strong>Nombre:</strong> {location.name}</p>
-                        <p><strong>Dirección:</strong> {location.address}</p>
-                        <p>
-                          <strong>Latitud:</strong> {location.lat}, <strong>Longitud:</strong> {location.lng}
-                        </p>
-                        <button
-                          className="text-blue-500 underline mt-2"
-                          onClick={() => startEditing(index, location.name)}
-                        >
-                          Editar nombre
-                        </button>
-                      </>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
+          <LocationList
+            locations={locations}
+            startEditing={startEditing}
+            saveEditing={saveEditing}
+            editingIndex={editingIndex}
+            editingName={editingName}
+            setEditingName={setEditingName}
+          />
         </div>
       </div>
     </section>
