@@ -7,6 +7,7 @@ const LocationList = ({
   editingIndex,
   editingName,
   setEditingName,
+  editingNameError,
 }) => {
   return (
     <div className="flex flex-col h-full">
@@ -21,18 +22,25 @@ const LocationList = ({
             {locations.map((loc, index) => (
               <li key={index} className="border p-4 rounded shadow-md">
                 {editingIndex === index ? (
-                  <div className="flex items-center gap-2">
-                    <input
-                      className="border border-gray-300 rounded p-1 flex-grow"
-                      value={editingName}
-                      onChange={(e) => setEditingName(e.target.value)}
-                    />
-                    <button
-                      className="bg-blue-500 text-white px-2 py-1 rounded"
-                      onClick={saveEditing}
-                    >
-                      Guardar
-                    </button>
+                  <div className="flex flex-col">
+                    <div className="flex items-center gap-2">
+                      <input
+                        className="border border-gray-300 rounded p-1 flex-grow"
+                        value={editingName}
+                        onChange={(e) => setEditingName(e.target.value)}
+                      />
+                      <button
+                        className="bg-blue-500 text-white px-2 py-1 rounded"
+                        onClick={saveEditing}
+                      >
+                        Guardar
+                      </button>
+                    </div>
+                    {editingNameError && (
+                      <p className="text-red-500 text-sm mt-1">
+                        El nombre no puede estar vacío.
+                      </p>
+                    )}
                   </div>
                 ) : (
                   <>
@@ -42,7 +50,7 @@ const LocationList = ({
                       <strong>Latitud:</strong> {loc.lat}, <strong>Longitud:</strong> {loc.lng}
                     </p>
                     <button
-                      className="text-blue-500  mt-2 hover:underline"
+                      className="text-blue-500 underline mt-2"
                       onClick={() => startEditing(index, loc.name)}
                     >
                       Editar nombre

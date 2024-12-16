@@ -34,7 +34,7 @@ const MapComponent = ({
   return (
     <GoogleMap
       mapContainerStyle={containerStyle}
-      center={selectedLocation.lat && selectedLocation.lng ? { lat: selectedLocation.lat, lng: selectedLocation.lng } : { lat: 13.69, lng: -89.19 }} // Coordenadas iniciales
+      center={selectedLocation.lat && selectedLocation.lng ? { lat: selectedLocation.lat, lng: selectedLocation.lng } : { lat: 13.69, lng: -89.19 }} 
       zoom={selectedLocation.lat && selectedLocation.lng ? 15 : 10}
       onClick={handleMapClick}
       onLoad={onLoad}

@@ -20,7 +20,9 @@ const App = () => {
 
   const [editingIndex, setEditingIndex] = useState(null);
   const [editingName, setEditingName] = useState("");
+  const [editingNameError, setEditingNameError] = useState(false); 
 
+  // Almacenamiento local
   useEffect(() => {
     saveLocationsToStorage(locations);
   }, [locations]);
@@ -30,7 +32,7 @@ const App = () => {
     const lng = event.latLng.lng();
 
     setSelectedLocation((prev) => ({
-      ...prev, 
+      ...prev,
       lat,
       lng,
       address: "Buscando dirección...",
@@ -38,6 +40,7 @@ const App = () => {
 
     setShowInfoWindow(false);
 
+    // Llamada a la API de Google Maps
     try {
       const response = await fetch(
         `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`
@@ -73,21 +76,29 @@ const App = () => {
   const startEditing = (index, currentName) => {
     setEditingIndex(index);
     setEditingName(currentName);
+    setEditingNameError(false); 
   };
 
   const saveEditing = () => {
+    if (!editingName.trim()) {
+      setEditingNameError(true);
+      return;
+    }
+
     const updatedLocations = [...locations];
-    updatedLocations[editingIndex].name = editingName;
+    updatedLocations[editingIndex].name = editingName.trim();
     setLocations(updatedLocations);
     setEditingIndex(null);
     setEditingName("");
+    setEditingNameError(false); 
   };
 
   return (
     <section className="text-gray-600 body-font relative h-screen">
       <div className="container mx-auto grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-8 h-full">
         <div className="flex flex-col gap-4 h-full">
-          <LocationForm
+          
+          <LocationForm // Componente del formulario
             selectedLocation={selectedLocation}
             setSelectedLocation={setSelectedLocation}
             saveLocation={saveLocation}
@@ -95,7 +106,7 @@ const App = () => {
             addressError={addressError}
           />
           <div className="w-full h-[400px] bg-gray-300 rounded-lg overflow-hidden">
-            <MapComponent
+            <MapComponent // Componente del mapa
               selectedLocation={selectedLocation}
               handleMapClick={handleMapClick}
               showInfoWindow={showInfoWindow}
@@ -106,13 +117,14 @@ const App = () => {
         </div>
 
         <div className="bg-white flex flex-col w-full rounded h-full max-h-screen">
-          <LocationList
+          <LocationList // Componente de la lista de localizaciones
             locations={locations}
             startEditing={startEditing}
             saveEditing={saveEditing}
             editingIndex={editingIndex}
             editingName={editingName}
             setEditingName={setEditingName}
+            editingNameError={editingNameError} 
           />
         </div>
       </div>
